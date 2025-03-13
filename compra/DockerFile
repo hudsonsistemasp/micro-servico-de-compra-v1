@@ -1,0 +1,24 @@
+#Aqui se faz o build da aplicação
+
+# Etapa 1: Compilar a aplicação
+FROM maven:3.9.8-eclipse-temurin-21 AS build
+
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /home/app
+
+# Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho,
+# ou seja, os arquivos do projeto para dentro do contêiner.
+COPY src /home/app/src
+COPY pom.xml /home/app
+
+# Compila a aplicação
+RUN mvn -f /home/app/pom.xml clean package -Dmaven.test.skip=true
+
+#Aqui já é a execução do aplicativo
+FROM openjdk:21
+COPY --from=build /home/app/target/app.war /user/local/lib/app.war
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","/user/local/lib/app.war"]
+

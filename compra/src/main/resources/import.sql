@@ -1,0 +1,1 @@
+insert into tb_pedido (codigo_pedido, nome_cliente, cpf_cliente, email_cliente, cep, codigo_produto, valor, data_compra, numero_cartao, limite_disponivel) values (2, 'Zacarias Zombrelo Borges', '682.814.260-80', 'paranostodosdigital@gmail.com', '30692-420', 888, 108, '2025-02-21', '5446 0810 6240 3390', 188)
