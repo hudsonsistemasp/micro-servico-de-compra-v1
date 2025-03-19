@@ -128,7 +128,7 @@ public class Pedido implements Serializable {
     public Cartao getCartao() {
         return cartao;
     }
-/*
+
     @Override
     public String toString() {
         return "Pedido{" +
@@ -140,8 +140,7 @@ public class Pedido implements Serializable {
                 ", codigoProduto=" + codigoProduto +
                 ", valor=" + valor +
                 ", dataCompra=" + dataCompra +
+                ", cartao=" + cartao +
                 '}';
     }
-
-   */
 }
