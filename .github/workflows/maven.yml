@@ -1,0 +1,44 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Pipeline
+
+#configurado para rodar quando houver um push ou pull_request na main. Pode ser apenas um, se quiser
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # build` é o nome do job
+  build:
+    #nome para ser exibido no repositório
+    name: Build, Test and Deploy
+    #utilizando uma instância do ubuntu como runner
+    runs-on: ubuntu-latest
+
+    steps:
+    #utilizando a action checkout para fazer o git clone na runner
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+    #utilizado o action setup-java para configurar a versão necessária do JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        #configurar um cache para cachear as dependências do projeto que estão no pom.xml
+        #isso permite que as próximas execuções do workflow sejam mais rápidas, pois estas
+        #estarão disponíveis no runner. lembre que as bibliotecas estão na pasta ~/.m2
+        cache: maven
+    #Apenas definindo o comando para rodar no runner    
+    - name: Build with Maven
+    #Por default vem "mvn -B package --file pom.xml", mas esse dá o build no projeto, 
+    #mas queremos rodar os tests, por isso mudamos a instrução abaixo
+      run: mvn -B test --file ./compra/pom.xml
+
