@@ -16,10 +16,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # build` é o nome do job
-  build:
+  # 'tests` é o nome do job
+  tests:
     #nome para ser exibido no repositório
-    name: Build, Test and Deploy
+    name: Run Unit Tests
     #utilizando uma instância do ubuntu como runner
     runs-on: ubuntu-latest
 
@@ -27,7 +27,7 @@ jobs:
     #utilizando a action checkout para fazer o git clone na runner
     - uses: actions/checkout@v4
     - name: Set up JDK 21
-    #utilizado o action setup-java para configurar a versão necessária do JDK
+      #utilizado o action setup-java para configurar a versão necessária do JDK
       uses: actions/setup-java@v4
       with:
         java-version: '21'
@@ -38,7 +38,44 @@ jobs:
         cache: maven
     #Apenas definindo o comando para rodar no runner    
     - name: Build with Maven
-    #Por default vem "mvn -B package --file pom.xml", mas esse dá o build no projeto, 
-    #mas queremos rodar os tests, por isso mudamos a instrução abaixo
+      #Por default vem "mvn -B package --file pom.xml", mas esse dá o build no projeto, 
+      #mas queremos rodar os tests, por isso mudamos a instrução abaixo
       run: mvn -B test --file ./compra/pom.xml
+
+  build:
+    #Esta propriedade cria âncora com job tests e diz que só vai buildar se esta der success
+    needs: tests
+    name: Build Maven package
+    #utilizando uma instância do ubuntu como runner
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        #Compilação do Java. utilizado o action setup-java para configurar a versão necessária do JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          #configurar um cache para cachear as dependências do projeto que estão no pom.xml
+          #isso permite que as próximas execuções do workflow sejam mais rápidas, pois estas
+          #estarão disponíveis no runner. lembre que as bibliotecas estão na pasta ~/.m2
+          cache: maven    
+      - name: Cache local Maven repository
+        uses: action/cache@v4
+        #Dentro da máquina runner, apontar as dependências do projeto que estão no pom.xml
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('./compra/pom.xml') }}
+          restore-keys: | 
+            ${{ runner.os }}-maven-
+      #Construção do artefato. Dando o comando package do Maven para buildar a aplicação
+      - name: Build Maven Package .war 
+        run: mvn -B package -DskipeTests --file ./compra/pom.xml
+      #Copiar o artefato para depois subirmos para a AWS. Download será usado na action abaixo
+      - name: Upload do .war
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artefato da aplicação 
+          path: ./compra/target/app.war
 
