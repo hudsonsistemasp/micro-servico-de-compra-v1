@@ -43,7 +43,7 @@ jobs:
       run: mvn -B test --file ./compra/pom.xml
 
   build:
-    #Esta propriedade cria âncora com job tests e diz que só vai buildar se esta der success
+    #Esta propriedade cria âncora com job tests acima e diz que só vai buildar se esta der success
     needs: tests
     name: Build Maven package
     #utilizando uma instância do ubuntu como runner
@@ -71,7 +71,7 @@ jobs:
             ${{ runner.os }}-maven-
       #Construção do artefato. Dando o comando package do Maven para buildar a aplicação
       - name: Build Maven Package .war 
-        run: mvn -B package -DskipeTests --file ./compra/pom.xml
+        run: mvn -B package -DskipTests --file ./compra/pom.xml
       #Copiar o artefato para depois subirmos para a AWS. Download será usado na action abaixo
       - name: Upload do .war
         uses: actions/upload-artifact@v4
