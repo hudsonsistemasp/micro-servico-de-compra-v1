@@ -62,7 +62,7 @@ jobs:
           #estarão disponíveis no runner. lembre que as bibliotecas estão na pasta ~/.m2
           cache: maven    
       - name: Cache local Maven repository
-        uses: action/cache@v4
+        uses: actions/cache@v4
         #Dentro da máquina runner, apontar as dependências do projeto que estão no pom.xml
         with:
           path: ~/.m2
