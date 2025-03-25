@@ -43,7 +43,7 @@ jobs:
       run: mvn -B test --file ./compra/pom.xml
 
   build:
-    #Esta propriedade cria âncora com job tests acima e diz que só vai buildar se esta der success
+    #Esta propriedade cria âncora com job "tests" acima e diz que só vai buildar se esta der success
     needs: tests
     name: Build Maven package
     #utilizando uma instância do ubuntu como runner
@@ -78,4 +78,34 @@ jobs:
         with:
           name: Artefato da aplicação 
           path: ./compra/target/app.war
+  #Novo step "deploy_aws" para integração à AWS        
+  deploy_aws:
+    #Essa propriedade diz: precisa que a job "build" dê certo para fazermos as instruções seguintes
+    needs: build
+    name: Begin Deploy para AWS Elastic Beanstall
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download .war
+        uses: actions/download-artifact@v4
+        with:
+          # "Artefato da aplicação" é o nome que está no step "build", um pouco acima na prop "name"
+          name: Artefato da aplicação
+      #Fazer essa integração com a Aws e copiar esse artefato para esta instância    
+      - name: Deploy para Elastic Beanstall
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: app-spring-boot-mscompra
+          environment_name: app-spring-boot-mscompra-env
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          #Caso a versão atual do EB dê problema, ele pegará a versão anterior que que está estável
+          use_existing_version_if_available: true
+          #Aumentar o timeout do deploy na AWS
+          wait_for_environment_recovery: 150
+          #É o nome do arquivo que foi gerado através do pom.xml que está na aplicação e o que está no gitAction
+          deployment_package: app.war
+
+
 
