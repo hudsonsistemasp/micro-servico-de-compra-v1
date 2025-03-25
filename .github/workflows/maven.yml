@@ -97,7 +97,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: app-spring-boot-mscompra
-          environment_name: app-spring-boot-mscompra-env
+          environment_name: App-spring-boot-mscompra-env
           version_label: ${{ github.sha }}
           region: us-east-1
           #Caso a versão atual do EB dê problema, ele pegará a versão anterior que que está estável
