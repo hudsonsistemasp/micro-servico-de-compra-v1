@@ -3,16 +3,19 @@
 version: '4.0.5'
 services:
   backend:
-    container_name: backend
+    container_name: backend-spring-boot-image
     restart: always
     #o build aponta para o arquivo DockerFile e assim os comandos são executados
-    build: .
+    build:
+      context: ./
+      dockerfile: DockerFile
     ports:
-      - "8080:8080"
+      #- "8081:8080"
+      - "5000:5000"
     links:
       - rabbitmq #é o rabbitmq abaixo e a aplicação e o rabbit precisam ficar na mesma rede.
                  #para as requisições funcionarem e configuração dos applications.properties funcionarem
-                 #Nesta linha ele executa os comandos abaixo e de pois volta para o NETWORK e sobe a aplicação
+                 #Nesta linha ele executa os comandos abaixo e depois volta para o NETWORK e sobe a aplicação
     networks:
       host:
 
